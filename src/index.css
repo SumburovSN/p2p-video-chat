@@ -1,0 +1,123 @@
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background-color: #1a1a1a;
+  color: #ffffff;
+}
+
+.app-container {
+  padding: 20px;
+  text-align: center;
+  min-height: 100vh;
+}
+
+h1 {
+  color: #f3f3f3;
+  margin-bottom: 30px;
+}
+
+.id-block {
+  background-color: #2a2a2a;
+  padding: 15px 25px;
+  border-radius: 8px;
+  display: inline-block;
+  border: 1px solid #3a3a3a;
+}
+
+.id-highlight {
+  color: #646cff;
+  font-size: 1.1em;
+}
+
+.input-field {
+  padding: 10px 15px;
+  margin-right: 10px;
+  width: 260px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background-color: #2a2a2a;
+  color: #fff;
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: #646cff;
+}
+
+button {
+  padding: 10px 20px;
+  font-weight: 600;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary { background-color: #646cff; color: white; }
+.btn-primary:hover { background-color: #535bf2; }
+
+.btn-secondary { background-color: #444; color: #e5e5e5; margin-top: 5px; }
+.btn-secondary:hover { background-color: #555; }
+
+.btn-danger { background-color: #ff4646; color: white; }
+.btn-danger:hover { background-color: #e03e3e; }
+
+.video-grid {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+
+.video-box h3 {
+  margin-bottom: 10px;
+  color: #aaa;
+}
+
+.video-element {
+  width: 440px;
+  height: 330px;
+  border-radius: 12px;
+  background-color: #000000;
+  object-fit: cover;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  border: 2px solid #333;
+}
+
+.video-element.mirror {
+  transform: scaleX(-1);
+}
+
+/* Новые стили для панели активного звонка */
+.call-actions-block {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Общий стиль для кнопок Mute (микрофон и камера) */
+.btn-mute {
+  color: white;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-mute:active {
+  transform: scale(0.98);
+}
+
+/* Состояния кнопок (включено/выключено) */
+.btn-status-on {
+  background-color: #4caf50; /* Зеленый */
+}
+.btn-status-on:hover {
+  background-color: #43a047;
+}
+
+.btn-status-off {
+  background-color: #ff9800; /* Оранжевый */
+}
+.btn-status-off:hover {
+  background-color: #fb8c00;
+}
