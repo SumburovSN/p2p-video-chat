@@ -1,23 +1,22 @@
 import React from 'react';
 
-// Явно принимаем объект props и достаем из него myId
-export default function UserIdentity({ myId }) {
+export default function UserIdentity({ shareableLink }) {
   const copyToClipboard = () => {
-    if (!myId) return alert('ID еще не сгенерирован!');
-    navigator.clipboard.writeText(myId);
-    alert('ID скопирован в буфер обмена!');
+    if (!shareableLink) return alert('Ссылка еще формируется...');
+    navigator.clipboard.writeText(shareableLink);
+    alert('Ссылка на комнату скопирована! Отправьте её другу.');
   };
 
   return (
     <div className="id-block">
       <p>
-        Ваш ID для друга:{' '}
-        <strong className="id-highlight">
-          {myId ? myId : 'Генерация (проверьте VPN)...'}
+        🔴 Ссылка на вашу комнату:{' '}
+        <strong className="id-highlight" style={{ fontSize: '0.9em', display: 'block', margin: '5px 0', wordBreak: 'break-all' }}>
+          {shareableLink || 'Генерация комнаты...'}
         </strong>
       </p>
-      <button className="btn-secondary" onClick={copyToClipboard} disabled={!myId}>
-        Скопировать мой ID
+      <button className="btn-secondary" onClick={copyToClipboard} disabled={!shareableLink}>
+        🔗 Скопировать ссылку для друга
       </button>
     </div>
   );

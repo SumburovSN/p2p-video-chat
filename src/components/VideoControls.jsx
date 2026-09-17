@@ -1,16 +1,16 @@
 import React from 'react';
-import UserIdentity from './UserIdentity'; // Теперь эта строчка загорится ярко!
-import CallDialer from './CallDialer';
+import UserIdentity from './UserIdentity';
+// import CallDialer from './CallDialer';
 import ActiveCallBar from './ActiveCallBar';
 
 export default function VideoControls({ 
-  myId, 
-  friendId, 
-  setFriendId, 
-  callConnected, 
+  shareableLink, // Принимаем ссылку вместо myId
+  // friendId, 
+  // setFriendId, 
+  // callConnected, 
   isAudioMuted, 
   isVideoMuted, 
-  onStartCall, 
+  // onStartCall, 
   onEndCall,
   onToggleAudio,
   onToggleVideo 
@@ -18,12 +18,21 @@ export default function VideoControls({
   return (
     <div className="controls-container">
       <UserIdentity
-        myId={myId}
+        shareableLink={shareableLink}
       />      
 
       <br />
+      <ActiveCallBar 
+        isAudioMuted={isAudioMuted}
+        isVideoMuted={isVideoMuted}
+        onToggleAudio={onToggleAudio}
+        onToggleVideo={onToggleVideo}
+        onEndCall={onEndCall}
+      />
+      
+    </div>
 
-      {/* Переключаем панели набора номера или управления звонком */}
+      /* Переключаем панели набора номера или управления звонком
       {!callConnected ? (
         <CallDialer 
           friendId={friendId} 
@@ -39,6 +48,6 @@ export default function VideoControls({
           onEndCall={onEndCall}
         />
       )}
-    </div>
+    </div> */
   );
 }

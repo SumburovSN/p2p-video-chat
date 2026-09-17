@@ -10,7 +10,7 @@ export default function CallDialer({ friendId, setFriendId, onStartCall }) {
         onChange={(e) => setFriendId(e.target.value)}
         className="input-field"
       />
-      <button className="btn-primary" onClick={onStartCall}>Позвонить</button>
+      <button className="btn-primary" onClick={() => onStartCall()}>Позвонить</button>
     </div>
   );
 }
