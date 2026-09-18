@@ -64,8 +64,19 @@ export function usePeerVideoChat() {
       path: '/myapp',
       config: {
         iceServers: [
-          { urls: 'stun:stun.cloudflare.com:3478' },
-        ]
+          {
+            urls: 'stun:sumburovsn.fvds.ru:3478',
+          },
+          {
+            urls: [
+              'turn:sumburovsn.fvds.ru:3478?transport=udp',
+              'turn:sumburovsn.fvds.ru:3478?transport=tcp',
+              'turns:sumburovsn.fvds.ru:5349?transport=tcp',
+            ],
+            username: 'videochat',
+            credential: 'XATSxXBh5kQW5cd9CRqNrOb8PEiWviiR',
+          },
+        ],
       }
     });
 
