@@ -1,16 +1,18 @@
 import React from 'react';
 import UserIdentity from './UserIdentity';
-// import CallDialer from './CallDialer';
 import ActiveCallBar from './ActiveCallBar';
 
 export default function VideoControls({ 
-  shareableLink, // Принимаем ссылку вместо myId
-  // friendId, 
-  // setFriendId, 
-  // callConnected, 
+  myId,
+  friendId,
+  callConnected,
+
+  iceConnectionState,
+  iceGatheringState,
+  webRtcConnectionState,
+
   isAudioMuted, 
-  isVideoMuted, 
-  // onStartCall, 
+  isVideoMuted,
   onEndCall,
   onToggleAudio,
   onToggleVideo 
@@ -18,10 +20,16 @@ export default function VideoControls({
   return (
     <div className="controls-container">
       <UserIdentity
-        shareableLink={shareableLink}
-      />      
+        myId={myId}
+        friendId={friendId}
+        callConnected={callConnected}
+        iceConnectionState={iceConnectionState}
+        iceGatheringState={iceGatheringState}
+        webRtcConnectionState={webRtcConnectionState}
+      />
 
       <br />
+
       <ActiveCallBar 
         isAudioMuted={isAudioMuted}
         isVideoMuted={isVideoMuted}
@@ -29,25 +37,6 @@ export default function VideoControls({
         onToggleVideo={onToggleVideo}
         onEndCall={onEndCall}
       />
-      
     </div>
-
-      /* Переключаем панели набора номера или управления звонком
-      {!callConnected ? (
-        <CallDialer 
-          friendId={friendId} 
-          setFriendId={setFriendId} 
-          onStartCall={onStartCall} 
-        />
-      ) : (
-        <ActiveCallBar 
-          isAudioMuted={isAudioMuted}
-          isVideoMuted={isVideoMuted}
-          onToggleAudio={onToggleAudio}
-          onToggleVideo={onToggleVideo}
-          onEndCall={onEndCall}
-        />
-      )}
-    </div> */
   );
 }

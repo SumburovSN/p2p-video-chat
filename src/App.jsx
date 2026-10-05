@@ -10,14 +10,17 @@ export default function App() {
     <div className="app-container">
       <h1>📹 P2P Видеочат</h1>
       
-      <VideoControls 
-        shareableLink={chat.shareableLink} // Передаем ссылку
-        // friendId={chat.friendId}
-        // setFriendId={chat.setFriendId}
-        // callConnected={chat.callConnected}
+      <VideoControls
+        myId={chat.myId}
+        friendId={chat.friendId}
+        callConnected={chat.callConnected}
+        
+        iceConnectionState={chat.iceConnectionState}
+        iceGatheringState={chat.iceGatheringState}
+        webRtcConnectionState={chat.webRtcConnectionState}
+        
         isAudioMuted={chat.isAudioMuted}
         isVideoMuted={chat.isVideoMuted}
-        // onStartCall={chat.startCall}
         onEndCall={chat.endCall}
         onToggleAudio={chat.toggleAudio}
         onToggleVideo={chat.toggleVideo}

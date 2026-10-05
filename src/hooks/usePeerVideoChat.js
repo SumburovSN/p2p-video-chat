@@ -7,7 +7,10 @@ export function usePeerVideoChat() {
   const [callConnected, setCallConnected] = useState(false);
   const [isAudioMuted, setIsAudioMuted] = useState(false);
   const [isVideoMuted, setIsVideoMuted] = useState(false);
-  const [shareableLink, setShareableLink] = useState(''); // Новое: ссылка для друга
+
+  const [iceConnectionState, setIceConnectionState] = useState('');
+  const [iceGatheringState, setIceGatheringState] = useState('');
+  const [webRtcConnectionState, setWebRtcConnectionState] = useState('');
 
   const myVideoRef = useRef(null);
   const friendVideoRef = useRef(null);
@@ -16,47 +19,6 @@ export function usePeerVideoChat() {
   const localStreamRef = useRef(null);
 
   useEffect(() => {
-    // 1. Проверяем, зашел ли пользователь уже по чьей-то ссылке комнаты
-    const urlParams = new URLSearchParams(window.location.search);
-    const roomIdFromUrl = urlParams.get('room');
-
-    if (roomIdFromUrl) {
-      setFriendId(roomIdFromUrl);
-    }
-
-    // 2. Инициализируем PeerJS
-    // const peer = new Peer({
-    //   config: {
-    //     iceServers: [
-    //         {
-    //           urls: "stun:stun.relay.metered.ca:80",
-    //         },
-    //         {
-    //           urls: "turn:global.relay.metered.ca:80",
-    //           username: "685537b16ab53969fb5a4762",
-    //           credential: "yALWD7THSXqDmn+K",
-    //         },
-    //         {
-    //           urls: "turn:global.relay.metered.ca:80?transport=tcp",
-    //           username: "685537b16ab53969fb5a4762",
-    //           credential: "yALWD7THSXqDmn+K",
-    //         },
-    //         {
-    //           urls: "turn:global.relay.metered.ca:443",
-    //           username: "685537b16ab53969fb5a4762",
-    //           credential: "yALWD7THSXqDmn+K",
-    //         },
-    //         {
-    //           urls: "turns:global.relay.metered.ca:443?transport=tcp",
-    //           username: "685537b16ab53969fb5a4762",
-    //           credential: "yALWD7THSXqDmn+K",
-    //         },
-    //     ],
-    //     // Указываем WebRTC перебирать абсолютно все доступные типы подключений
-    //     iceTransportPolicy: 'all'
-    //   }
-    // });
-    // const peer = new Peer();
     const peer = new Peer({
       host: 'sumburovsn.fvds.ru',
       secure: true,
@@ -84,21 +46,16 @@ export function usePeerVideoChat() {
       setMyId(id);
       console.log('🆔 Мой PeerJS ID:', id);
 
-      // 3. Логика генерации ссылки:
-      if (!roomIdFromUrl) {
-        // Если мы первые — добавляем наш ID в адресную строку и создаем ссылку
-        const newUrl = `${window.location.origin}${window.location.pathname}?room=${id}`;
-        window.history.replaceState({ path: newUrl }, '', newUrl);
-        setShareableLink(newUrl);
-      } else {
-        // Если мы перешли по ссылке друга — формируем ссылку на основе его ID
-        setShareableLink(window.location.href);
-      }
+      // Запускаем автоматический matchmaking
+      joinMatchmaking(id);
     });
 
     // 4. Ожидание входящего звонка
     peer.on('call', (call) => {
       console.log('📞 ВХОДЯЩИЙ CALL от:', call.peer);
+
+      setFriendId(call.peer);
+
       getUserMediaStream()
         .then((stream) => {
           call.answer(stream);
@@ -122,22 +79,6 @@ export function usePeerVideoChat() {
       if (peerInstance.current) peerInstance.current.destroy();
     };
   }, []);
-
-  // Автоматический звонок: как только сеть PeerJS выдала нам ID, И в URL был ID друга — звоним сами!
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const roomIdFromUrl = urlParams.get('room');
-
-    // Важно: звоним только если мы зашли по ссылке (roomIdFromUrl существует) 
-    // и наш собственный myId уже готов, но звонок еще не соединен
-    if (myId && roomIdFromUrl && roomIdFromUrl !== myId && !callConnected) {
-      // Краткая пауза, чтобы браузер успел стабилизировать сокеты
-      const timer = setTimeout(() => {
-        startCall(roomIdFromUrl);
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [myId, callConnected]);
 
   const getUserMediaStream = async () => {
     if (localStreamRef.current) return localStreamRef.current;
@@ -191,25 +132,23 @@ export function usePeerVideoChat() {
   console.log('🔎 Initial signaling state:', pc.signalingState);
   console.log('🔎 Initial ICE gathering state:', pc.iceGatheringState);
 
+  setIceConnectionState(pc.iceConnectionState);
+  setWebRtcConnectionState(pc.connectionState);
+  setIceGatheringState(pc.iceGatheringState);
+
   pc.addEventListener('iceconnectionstatechange', () => {
-    console.log(
-      '🧊 ICE connection state:',
-      pc.iceConnectionState
-    );
+    console.log('🧊 ICE connection state:', pc.iceConnectionState);
+    setIceConnectionState(pc.iceConnectionState);
   });
 
   pc.addEventListener('connectionstatechange', () => {
-    console.log(
-      '🔗 WebRTC connection state:',
-      pc.connectionState
-    );
+    console.log('🔗 WebRTC connection state:',pc.connectionState);
+    setWebRtcConnectionState(pc.connectionState);
   });
 
   pc.addEventListener('icegatheringstatechange', () => {
-    console.log(
-      '📡 ICE gathering state:',
-      pc.iceGatheringState
-    );
+    console.log('📡 ICE gathering state:', pc.iceGatheringState);
+    setIceGatheringState(pc.iceGatheringState);
   });
 
   pc.addEventListener('signalingstatechange', () => {
@@ -244,6 +183,81 @@ export function usePeerVideoChat() {
   // диагностика ICE
   // */}
 
+    // Подключаемся к Room Manager и пытаемся найти собеседника
+  const joinMatchmaking = async (peerId) => {
+    try {
+      console.log('🏠 Отправляем PeerJS ID в Room Manager:', peerId);
+
+      const response = await fetch('/api/room/join', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          peerId,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Room Manager HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      console.log('🏠 Ответ Room Manager:', data);
+
+      if (data.role === 'waiting') {
+        console.log('⏳ Собеседник пока не найден, ждём...');
+        return;
+      }
+
+      if (data.role === 'connected' && data.friendId) {
+        console.log('🤝 Собеседник найден:', data.friendId);
+
+        setFriendId(data.friendId);
+
+        // Небольшая пауза, чтобы PeerJS успел стабилизировать соединение
+        setTimeout(() => {
+          startCall(data.friendId);
+        }, 1000);
+
+        return data.friendId;
+      }
+
+      console.warn('⚠️ Неизвестный ответ Room Manager:', data);
+    } catch (err) {
+      console.error('❌ Ошибка matchmaking:', err);
+    }
+  };
+
+  const leaveMatchmaking = async (peerId = myId) => {
+  if (!peerId) {
+    return;
+  }
+
+  try {
+    console.log('🚪 Выходим из Room Manager:', peerId);
+
+    const response = await fetch('/api/room/leave', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ peerId }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Room Manager HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    console.log('🚪 Ответ Room Manager:', data);
+  } catch (err) {
+    console.error('❌ Ошибка выхода из matchmaking:', err);
+  }
+};
+
   const startCall = async (targetId = friendId) => {    
     const idToCall = targetId || friendId;
     console.log('📞 ПЫТАЕМСЯ ПОЗВОНИТЬ:', idToCall);
@@ -267,17 +281,26 @@ export function usePeerVideoChat() {
     }
   };
 
-  const endCall = () => {
-    if (currentCall.current) currentCall.current.close();
-    if (friendVideoRef.current) friendVideoRef.current.srcObject = null;
-    stopLocalStream();
-    setCallConnected(false);
-    // Очищаем адресную строку при сбросе, возвращая чистый сайт
-    const cleanUrl = `${window.location.origin}${window.location.pathname}`;
-    window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
-    setShareableLink('');
-    setFriendId('');
-  };
+  const endCall = async () => {
+  if (currentCall.current) {
+    currentCall.current.close();
+    currentCall.current = null;
+  }
+
+  if (friendVideoRef.current) {
+    friendVideoRef.current.srcObject = null;
+  }
+
+  await leaveMatchmaking();
+
+  stopLocalStream();
+  setCallConnected(false);
+
+  const cleanUrl = `${window.location.origin}${window.location.pathname}`;
+  window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+  
+  setFriendId('');
+};
 
   return {
     myId,
@@ -286,11 +309,14 @@ export function usePeerVideoChat() {
     callConnected,
     isAudioMuted,
     isVideoMuted,
-    shareableLink, // Прокидываем готовую ссылку наружу
+    iceConnectionState,
+    iceGatheringState,
+    webRtcConnectionState,
     myVideoRef,
     friendVideoRef,
     startCall,
     endCall,
+    leaveMatchmaking,
     toggleAudio,
     toggleVideo
   };

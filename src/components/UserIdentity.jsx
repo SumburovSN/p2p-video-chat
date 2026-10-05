@@ -1,23 +1,77 @@
 import React from 'react';
 
-export default function UserIdentity({ shareableLink }) {
-  const copyToClipboard = () => {
-    if (!shareableLink) return alert('Ссылка еще формируется...');
-    navigator.clipboard.writeText(shareableLink);
-    alert('Ссылка на комнату скопирована! Отправьте её другу.');
-  };
-
+export default function UserIdentity({
+  myId,
+  friendId,
+  callConnected,
+  iceConnectionState,
+  iceGatheringState,
+  webRtcConnectionState
+}) {
   return (
     <div className="id-block">
       <p>
-        🔴 Ссылка на вашу комнату:{' '}
-        <strong className="id-highlight" style={{ fontSize: '0.9em', display: 'block', margin: '5px 0', wordBreak: 'break-all' }}>
-          {shareableLink || 'Генерация комнаты...'}
-        </strong>
+        🆔 <strong>Мой PeerJS ID:</strong>
       </p>
-      <button className="btn-secondary" onClick={copyToClipboard} disabled={!shareableLink}>
-        🔗 Скопировать ссылку для друга
-      </button>
+
+      <strong
+        className="id-highlight"
+        style={{
+          fontSize: '0.85em',
+          display: 'block',
+          margin: '5px 0 15px',
+          wordBreak: 'break-all'
+        }}
+      >
+        {myId || 'Получение PeerJS ID...'}
+      </strong>
+
+      <p>
+        🏠 <strong>Matchmaking:</strong>{' '}
+        {friendId
+          ? '🤝 Собеседник найден'
+          : '⏳ Ищем собеседника...'}
+      </p>
+
+      <p>
+        👤 <strong>Собеседник:</strong>
+      </p>
+
+      <strong
+        className="id-highlight"
+        style={{
+          fontSize: '0.85em',
+          display: 'block',
+          margin: '5px 0 15px',
+          wordBreak: 'break-all'
+        }}
+      >
+        {friendId || '—'}
+      </strong>
+
+      <p>
+        📹 <strong>WebRTC:</strong>{' '}
+        {callConnected
+          ? '🟢 Соединение установлено'
+          : '⏳ Соединение не установлено'}
+      </p>
+
+      <hr />
+
+      <p>
+        🧊 <strong>ICE connection:</strong>{' '}
+        {iceConnectionState || '—'}
+      </p>
+
+      <p>
+        📡 <strong>ICE gathering:</strong>{' '}
+        {iceGatheringState || '—'}
+      </p>
+
+      <p>
+        🔗 <strong>WebRTC connection:</strong>{' '}
+        {webRtcConnectionState || '—'}
+      </p>
     </div>
   );
 }
