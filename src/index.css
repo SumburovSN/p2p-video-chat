@@ -25,23 +25,11 @@ h1 {
 }
 
 .id-highlight {
-  color: #646cff;
-  font-size: 1.1em;
-}
-
-.input-field {
-  padding: 10px 15px;
-  margin-right: 10px;
-  width: 260px;
-  border-radius: 6px;
-  border: 1px solid #444;
-  background-color: #2a2a2a;
-  color: #fff;
-  outline: none;
-}
-
-.input-field:focus {
-  border-color: #646cff;
+  color: #646cff;  
+  font-size: 0.85em;
+  display: block;
+  margin: 5px 0 15px;
+  word-break: break-all;
 }
 
 button {

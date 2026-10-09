@@ -14,15 +14,7 @@ export default function UserIdentity({
         🆔 <strong>Мой PeerJS ID:</strong>
       </p>
 
-      <strong
-        className="id-highlight"
-        style={{
-          fontSize: '0.85em',
-          display: 'block',
-          margin: '5px 0 15px',
-          wordBreak: 'break-all'
-        }}
-      >
+      <strong className="id-highlight">
         {myId || 'Получение PeerJS ID...'}
       </strong>
 
@@ -37,15 +29,7 @@ export default function UserIdentity({
         👤 <strong>Собеседник:</strong>
       </p>
 
-      <strong
-        className="id-highlight"
-        style={{
-          fontSize: '0.85em',
-          display: 'block',
-          margin: '5px 0 15px',
-          wordBreak: 'break-all'
-        }}
-      >
+      <strong className="id-highlight">
         {friendId || '—'}
       </strong>
 
